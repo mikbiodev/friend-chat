@@ -3,113 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Friend Chat By Miklos</title>
+    <title>Friend Chat by Miklos K</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             background-color: #f0f2f5;
         }
         .container {
             display: flex;
+            flex-direction: row;
             width: 100%;
+            max-width: 720px;
             height: 100%;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
         }
         .panel {
             padding: 10px;
             overflow-y: auto;
+        }
+        .panel.left-panel {
+            flex: 1;
+            background-color: #f7f9fa;
             border-right: 1px solid #ddd;
         }
-        .panel:last-child {
-            border-right: none;
-        }
-        .left-panel {
-            flex: 1;
-            background-color: #ffffff;
-        }
-        .middle-panel {
+        .panel.middle-panel {
             flex: 2;
             display: flex;
             flex-direction: column;
             background-color: #ffffff;
         }
-        .right-panel {
+        .panel.right-panel {
             flex: 1;
-            background-color: #ffffff;
+            background-color: #f7f9fa;
+            border-left: 1px solid #ddd;
         }
-        .channels {
-            margin-bottom: 20px;
-        }
-        .channel {
-            padding: 5px;
+        .channels .channel {
+            padding: 8px 10px;
             cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 5px;
         }
-        .channel:hover {
-            background-color: #f0f2f5;
-        }
-        .channel.active {
+        .channels .channel.active {
             font-weight: bold;
-            background-color: #e9ecef;
+            background-color: #e8f0fe;
+        }
+        .channels .channel:hover {
+            background-color: #f0f7ff;
         }
         .messages {
             flex: 1;
             padding: 10px;
-            border-top: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
             overflow-y: auto;
+            border-bottom: 1px solid #ddd;
         }
         .message {
             margin-bottom: 10px;
             padding: 10px;
-            border-radius: 5px;
+            border-radius: 8px;
             background-color: #f8f9fa;
+        }
+        .message small {
+            display: block;
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 5px;
         }
         .input-container {
             display: flex;
             padding: 10px;
         }
-        input[type="text"] {
+        .input-container input {
             flex: 1;
             padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 5px;
             margin-right: 10px;
         }
-        button {
+        .input-container button {
             padding: 10px 20px;
-            background: #007bff;
+            background-color: #007bff;
             color: #fff;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
         }
-        button:hover {
-            background: #0056b3;
+        .input-container button:hover {
+            background-color: #0056b3;
         }
         .username-setup {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            background-color: #f0f2f5;
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
         }
         .username-setup input {
-            margin-bottom: 10px;
+            width: 100%;
             padding: 10px;
-            width: 80%;
-            max-width: 300px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .username-setup button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .username-setup button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div id="username-setup" class="username-setup">
-        <h3>Set Your Username</h3>
+        <h2>Welcome to Chat & Messenger</h2>
+        <p>Set a username to start chatting</p>
         <input type="text" id="usernameInput" placeholder="Enter your username">
-        <button id="setUsernameButton">Set Username</button>
+        <button id="setUsernameButton">Start Chatting</button>
     </div>
 
     <div class="container" style="display: none;">
@@ -130,9 +159,7 @@
         </div>
         <div class="panel right-panel">
             <h3>Users Online</h3>
-            <div id="users">
-                <!-- Users will be dynamically added here -->
-            </div>
+            <div id="users"></div>
         </div>
     </div>
 
@@ -161,7 +188,7 @@
             channels[currentChannel].forEach((msg) => {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message');
-                messageElement.textContent = `${msg.username}: ${msg.text}`;
+                messageElement.innerHTML = `<strong>${msg.username}</strong>: ${msg.text} <small>${msg.timestamp}</small>`;
                 messagesDiv.appendChild(messageElement);
             });
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -186,7 +213,8 @@
         sendButton.addEventListener('click', () => {
             const messageText = messageInput.value.trim();
             if (messageText) {
-                channels[currentChannel].push({ username, text: messageText });
+                const timestamp = new Date().toLocaleTimeString();
+                channels[currentChannel].push({ username, text: messageText, timestamp });
                 renderMessages();
                 messageInput.value = '';
             }
