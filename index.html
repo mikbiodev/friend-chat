@@ -19,7 +19,7 @@
             display: flex;
             flex-direction: row;
             width: 100%;
-            max-width: 720px;
+            max-width: 840px;
             height: 100%;
             background: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -46,6 +46,9 @@
             background-color: #f7f9fa;
             border-left: 1px solid #ddd;
         }
+        .channels {
+            margin-bottom: 10px;
+        }
         .channels .channel {
             padding: 8px 10px;
             cursor: pointer;
@@ -58,6 +61,22 @@
         }
         .channels .channel:hover {
             background-color: #f0f7ff;
+        }
+        .channel-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .channel-actions button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .channel-actions button:hover {
+            background-color: #0056b3;
         }
         .messages {
             flex: 1;
@@ -77,8 +96,29 @@
             color: #888;
             margin-top: 5px;
         }
+        .emoji-picker {
+            position: absolute;
+            bottom: 60px;
+            left: 10px;
+            display: none;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .emoji-picker span {
+            cursor: pointer;
+            font-size: 1.2em;
+            margin: 5px;
+        }
+        .emoji-picker span:hover {
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
         .input-container {
             display: flex;
+            align-items: center;
             padding: 10px;
         }
         .input-container input {
@@ -98,6 +138,28 @@
         }
         .input-container button:hover {
             background-color: #0056b3;
+        }
+        .input-container .emoji-button {
+            margin-right: 10px;
+            padding: 5px 10px;
+            border-radius: 50%;
+            background-color: #f7f9fa;
+            cursor: pointer;
+        }
+        .input-container .emoji-button:hover {
+            background-color: #e8f0fe;
+        }
+        .user {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .user .status {
+            width: 10px;
+            height: 10px;
+            background-color: green;
+            border-radius: 50%;
+            margin-right: 10px;
         }
         .username-setup {
             display: flex;
@@ -143,6 +205,10 @@
     <div class="container" style="display: none;">
         <div class="panel left-panel">
             <h3>Channels</h3>
+            <div class="channel-actions">
+                <button id="addChannel">Add Channel</button>
+                <button id="removeChannel">Remove Channel</button>
+            </div>
             <div class="channels" id="channels">
                 <div class="channel active" data-channel="General"># General</div>
                 <div class="channel" data-channel="Random"># Random</div>
@@ -151,7 +217,11 @@
         </div>
         <div class="panel middle-panel">
             <div class="messages" id="messages"></div>
+            <div class="emoji-picker" id="emojiPicker">
+                <span>😀</span><span>😂</span><span>😍</span><span>😎</span><span>😢</span><span>👍</span>
+            </div>
             <div class="input-container">
+                <button class="emoji-button" id="toggleEmojiPicker">😊</button>
                 <input type="text" id="messageInput" placeholder="Type a message...">
                 <button id="sendButton">Send</button>
             </div>
@@ -172,6 +242,10 @@
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
         const usersDiv = document.getElementById('users');
+        const emojiPicker = document.getElementById('emojiPicker');
+        const toggleEmojiPicker = document.getElementById('toggleEmojiPicker');
+        const addChannelButton = document.getElementById('addChannel');
+        const removeChannelButton = document.getElementById('removeChannel');
 
         let username = '';
         let currentChannel = 'General';
@@ -196,8 +270,9 @@
         function renderUsers() {
             usersDiv.innerHTML = '';
             usersOnline.forEach((user) => {
-                const userElement = document.createElement('p');
-                userElement.textContent = user;
+                const userElement = document.createElement('div');
+                userElement.classList.add('user');
+                userElement.innerHTML = `<span class="status"></span>${user}`;
                 usersDiv.appendChild(userElement);
             });
         }
@@ -228,6 +303,43 @@
         channelsDiv.addEventListener('click', (event) => {
             if (event.target.classList.contains('channel')) {
                 switchChannel(event.target.getAttribute('data-channel'));
+            }
+        });
+
+        toggleEmojiPicker.addEventListener('click', () => {
+            emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
+        });
+
+        emojiPicker.addEventListener('click', (event) => {
+            if (event.target.tagName === 'SPAN') {
+                messageInput.value += event.target.textContent;
+            }
+        });
+
+        addChannelButton.addEventListener('click', () => {
+            const newChannel = prompt('Enter the name of the new channel:');
+            if (newChannel && !channels[newChannel]) {
+                channels[newChannel] = [];
+                const channelElement = document.createElement('div');
+                channelElement.classList.add('channel');
+                channelElement.textContent = `# ${newChannel}`;
+                channelElement.setAttribute('data-channel', newChannel);
+                channelsDiv.appendChild(channelElement);
+            }
+        });
+
+        removeChannelButton.addEventListener('click', () => {
+            const channelToRemove = prompt('Enter the name of the channel to remove:');
+            if (channelToRemove && channels[channelToRemove]) {
+                delete channels[channelToRemove];
+                const channelElement = document.querySelector(`.channel[data-channel="${channelToRemove}"]`);
+                if (channelElement) {
+                    channelsDiv.removeChild(channelElement);
+                }
+                if (currentChannel === channelToRemove) {
+                    currentChannel = 'General';
+                    switchChannel('General');
+                }
             }
         });
 
