@@ -10,25 +10,45 @@
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             height: 100vh;
             background-color: #f0f2f5;
         }
-        .chat-container {
+        .container {
+            display: flex;
             width: 100%;
-            max-width: 500px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            height: 100%;
+        }
+        .panel {
+            padding: 10px;
+            overflow-y: auto;
+            border-right: 1px solid #ddd;
+        }
+        .panel:last-child {
+            border-right: none;
+        }
+        .left-panel {
+            flex: 1;
+            background-color: #ffffff;
+        }
+        .middle-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+        }
+        .right-panel {
+            flex: 1;
+            background-color: #ffffff;
+        }
+        .channels {
+            margin-bottom: 20px;
         }
         .messages {
-            height: 300px;
-            overflow-y: auto;
+            flex: 1;
             padding: 10px;
+            border-top: 1px solid #ddd;
             border-bottom: 1px solid #ddd;
+            overflow-y: auto;
         }
         .message {
             margin-bottom: 10px;
@@ -58,11 +78,29 @@
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="messages" id="messages"></div>
-        <div class="input-container">
-            <input type="text" id="messageInput" placeholder="Type a message...">
-            <button id="sendButton">Send</button>
+    <div class="container">
+        <div class="panel left-panel">
+            <h3>Channels</h3>
+            <div class="channels" id="channels">
+                <p># General</p>
+                <p># Random</p>
+                <p># Tech</p>
+            </div>
+        </div>
+        <div class="panel middle-panel">
+            <div class="messages" id="messages"></div>
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="Type a message...">
+                <button id="sendButton">Send</button>
+            </div>
+        </div>
+        <div class="panel right-panel">
+            <h3>Users Online</h3>
+            <div id="users">
+                <p>User1</p>
+                <p>User2</p>
+                <p>User3</p>
+            </div>
         </div>
     </div>
 
